@@ -9,7 +9,9 @@
     "build:ugc-site-dev": "npm run build:staging",
     "build:ugc-site-prod": "npm run build:production",
     "lint": "vue-cli-service lint",
-    "format": "vue-cli-service lint --fix"
+    "format": "vue-cli-service lint --fix",
+    "cypress:open": "cypress open",
+    "e2e:local": "cypress run"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
@@ -43,6 +45,7 @@
     "@vue/cli-service": "~4.5.0",
     "@vue/eslint-config-typescript": "^5.0.2",
     "autoprefixer": "^9.8.6",
+    "cypress": "10.8.0",
     "eslint": "^6.7.2",
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-prettier": "^3.3.1",
