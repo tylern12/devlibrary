@@ -60,5 +60,4 @@ jobs:
           install: false
           working-directory: app
           config-file: cypress.config.ts
-          command: npm run e2e
           start: npm run serve,(cd ../functions && npm run serve)
