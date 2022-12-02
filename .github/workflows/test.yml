@@ -51,4 +51,5 @@ jobs:
         with:
           config-file: app/cypress.config.ts
           install-command: (cd app && npm ci),(cd functions && npm ci)
+          command: (cd app && npm run e2e)
           start: (cd app && npm run serve),(cd function && npm run serve)
