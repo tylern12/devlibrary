@@ -54,8 +54,10 @@ jobs:
 
       - name: Run e2e Tests
         uses: cypress-io/github-action@v4
+        env:
+          DEBUG: '@cypress/github-action'
         with:
           install: false
           config-file: app/cypress.config.ts
           command: (cd app && npm run e2e)
-          start: (cd app && npm run serve),(cd function && npm run serve)
+          start: (cd app && npm run serve),(cd functions && npm run serve)
