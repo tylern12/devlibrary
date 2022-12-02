@@ -49,4 +49,6 @@ jobs:
       - name: Run e2e Tests
         uses: cypress-io/github-action@v4
         with:
-          start: (cd app && npm run serve)
+          config-file: app/cypress.config.ts
+          install-command: (cd app && npm ci),(cd functions && npm ci)
+          start: (cd app && npm run serve),(cd function && npm run serve)
