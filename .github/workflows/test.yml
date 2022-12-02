@@ -60,4 +60,4 @@ jobs:
           install: false
           working-directory: app
           config-file: cypress.config.ts
-          start: npm run serve,(cd ../functions && npm run serve)
+          start: npm run serve,cd ../functions && npm run serve
