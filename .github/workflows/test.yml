@@ -58,6 +58,7 @@ jobs:
           DEBUG: '@cypress/github-action'
         with:
           install: false
-          config-file: app/cypress.config.ts
-          command: (cd app && npm run e2e)
-          start: (cd app && npm run serve),(cd functions && npm run serve)
+          working-directory: app
+          config-file: cypress.config.ts
+          command: npm run e2e
+          start: npm run serve,(cd ../functions && npm run serve)
