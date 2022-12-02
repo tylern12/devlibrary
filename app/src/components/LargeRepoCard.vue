@@ -15,14 +15,14 @@
 -->
 
 <template>
-  <div class="flex flex-col card card-clickable p-4" :id="`${repo.id}-card`">
+  <div class="flex flex-col card card-clickable p-4" :id="`${repo.id}-card`" data-test="card">
     <!-- Title -->
-    <router-link :to="link" class="wrap-lines-3">
+    <router-link data-test="card-link" :to="link" class="wrap-lines-3">
       <h3>{{ repo.metadata.name }}</h3>
     </router-link>
 
     <!-- Tags -->
-    <div v-if="showTags" class="card-tags mt-4 frc flex-wrap gap-2">
+    <div v-if="showTags" class="card-tags mt-4 frc flex-wrap gap-2" data-test="tag-chips">
       <TagChip
         v-for="t in repo.metadata.tags"
         :key="t"

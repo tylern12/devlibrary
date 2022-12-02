@@ -45,3 +45,8 @@ jobs:
 
       - name: Validate Schemas
         run: (cd shared && npm run validate)
+
+      - name: Cypress Run
+        uses: cypress-io/github-actions@v2
+        with:
+          run: (cd app && npm run serve)

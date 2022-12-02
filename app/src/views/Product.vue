@@ -127,6 +127,7 @@
                 @input="setTempSearchFilter"
                 :value="searchFilter"
                 placeholder="Search"
+                data-test="product-search-bar"
               />
               <font-awesome-icon
                 v-if="searchFilter.length > 0"
@@ -140,6 +141,7 @@
               type="primary"
               class="ml-4"
               id="productSearchButton"
+              data-test="product-search-button"
             >
               Go
             </MaterialButton>
@@ -225,6 +227,7 @@
               v-show="canLoadMore && searchFilter === ''"
             >
               <MaterialButton
+                data-test="load-more"
                 v-if="canLoadMore"
                 type="text"
                 @click.native="loadMore"

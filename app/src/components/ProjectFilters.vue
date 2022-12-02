@@ -59,6 +59,7 @@
             :values="product.tags.map((t) => t.value)"
             v-model="categories"
             :maxSelections="10"
+            data-test="category-checkbox"
           />
 
           <!-- Clear Filters Button-->

@@ -15,14 +15,14 @@
 -->
 
 <template>
-  <div class="flex flex-col card card-clickable p-4" :id="`${blog.id}-card`">
+  <div class="flex flex-col card card-clickable p-4" :id="`${blog.id}-card`" data-test="card">
     <!-- Title -->
-    <a :href="blog.metadata.link" class="wrap-lines-3">
+    <a data-test="card-link" :href="blog.metadata.link" class="wrap-lines-3">
       <h3>{{ blog.metadata.title }}</h3>
     </a>
 
     <!-- Tags -->
-    <div v-if="showTags" class="card-tags frc mt-4 flex-wrap gap-2">
+    <div v-if="showTags" class="card-tags frc mt-4 flex-wrap gap-2" data-test="tag-chips">
       <TagChip
         v-for="t in blog.metadata.tags"
         :key="t"
