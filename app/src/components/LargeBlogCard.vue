@@ -15,9 +15,25 @@
 -->
 
 <template>
-  <div class="flex flex-col card card-clickable p-4">
+  <div class="flex flex-col card card-clickable p-4" :id="`${blog.id}-card`">
+    <!-- Title -->
+    <a :href="blog.metadata.link" class="wrap-lines-3">
+      <h3>{{ blog.metadata.title }}</h3>
+    </a>
+
+    <!-- Tags -->
+    <div v-if="showTags" class="card-tags frc mt-4 flex-wrap gap-2">
+      <TagChip
+        v-for="t in blog.metadata.tags"
+        :key="t"
+        :label="getTag(t).label"
+        :textColor="getTag(t).textColor"
+        :bgColor="getTag(t).bgColor"
+      />
+    </div>
+
     <!-- Author photo and name -->
-    <div class="frc">
+    <div class="frc mt-6 mb-4">
       <!-- Link to author (if present) -->
       <template v-if="authorId">
         <router-link :to="`/authors/${authorId}`" class="frc">
@@ -47,23 +63,7 @@
         v-if="showLogo"
         size="xtiny"
         :productKey="blog.product"
-        class="ml-auto"
-      />
-    </div>
-
-    <!-- Title -->
-    <a :href="blog.metadata.link" class="mt-4 wrap-lines-3">
-      <h3>{{ blog.metadata.title }}</h3>
-    </a>
-
-    <!-- Tags -->
-    <div v-if="showTags" class="frc mt-4 flex-wrap gap-2">
-      <TagChip
-        v-for="t in blog.metadata.tags"
-        :key="t"
-        :label="getTag(t).label"
-        :textColor="getTag(t).textColor"
-        :bgColor="getTag(t).bgColor"
+        class="product-logo ml-auto"
       />
     </div>
 
@@ -122,7 +122,22 @@ export default class LargeBlogCard extends Vue {
   public authorImageLoaded = false;
 
   async mounted() {
+    if (this.isStale(this.blog.stats.lastUpdated)) {
+      document.getElementById(`${this.blog.id}-card`)!.className +=
+        " stale-card";
+    }
     this.authorImageLoaded = await this.getImage();
+  }
+
+  public isStale(lastUpdated: number) {
+    const daysAgo = dates.renderDaysAgo(lastUpdated);
+    if (daysAgo.includes("months ago")) {
+      const monthsAgo = daysAgo.split(" months ago");
+      if (parseInt(monthsAgo[0]) > 18) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public renderDaysAgo(lastUpdated: number) {

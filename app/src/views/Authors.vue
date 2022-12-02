@@ -34,26 +34,39 @@
     <!-- Body -->
     <div id="pagebody" class="mb-4 px-std">
       <!-- Search bar -->
-      <div class="mt-4 frc rounded-lg max-w-lg border border-gray-200 px-2">
-        <font-awesome-icon
-          icon="search"
-          size="sm"
-          class="text-mgray-700 opacity-70"
-        />
-        <input
-          class="px-2 py-1 flex-grow"
-          type="text"
-          v-model="authorFilter"
-          placeholder="Search for authors"
-        />
-        <font-awesome-icon
-          v-if="authorFilter.length > 0"
-          @click="authorFilter = ''"
-          icon="times-circle"
-          class="text-mgray-700 cursor-pointer opacity-70"
-        />
+      <div class="frc">
+        <div
+          class="mt-4 frc rounded-lg max-w-lg min-w-0 border border-gray-200 px-2 w-80"
+        >
+          <font-awesome-icon
+            icon="search"
+            size="sm"
+            class="text-mgray-700 opacity-70"
+          />
+          <input
+            class="px-2 py-1 flex-grow min-w-0"
+            type="text"
+            id="authorSearchBar"
+            @input="setTempAuthorFilter"
+            :value="authorFilter"
+            placeholder="Search"
+          />
+          <font-awesome-icon
+            v-if="authorFilter.length > 0"
+            @click="authorFilter = ''"
+            icon="times-circle"
+            class="text-mgray-700 cursor-pointer opacity-70"
+          />
+        </div>
+        <MaterialButton
+          @click.native="authorFilter = tempAuthorFilter"
+          type="primary"
+          class="ml-4 mt-4"
+          id="authorSearchButton"
+        >
+          Go
+        </MaterialButton>
       </div>
-
       <div
         v-if="showNoMatchesMessage"
         class="text-mgray-700 opacity-70 py-8 px-1"
@@ -74,7 +87,10 @@
           class="card card-clickable px-5 py-4 flex flex-col items-center text-center"
         >
           <CircleImage
-            v-if="authorImageLoaded[author.id]"
+            v-if="
+              authorImageLoaded[author.id] ||
+              authorImageLoaded[author.id] == undefined
+            "
             :src="author.metadata.photoURL"
             :lazy="true"
             class="flex-shrink-0 avatar border-none"
@@ -179,6 +195,7 @@ export default class Authors extends Vue {
   }
 
   public authorFilter = "";
+  public tempAuthorFilter = "";
 
   public authorImageLoaded: { [key: string]: boolean } = {};
 
@@ -191,6 +208,13 @@ export default class Authors extends Vue {
   );
 
   async mounted() {
+    const searchButton = document.getElementById("authorSearchBar");
+    searchButton?.addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        document.getElementById("authorSearchButton")?.click();
+      }
+    });
     const authorData = emptyPageResponse<AuthorData>(
       `/authors`,
       {
@@ -262,6 +286,10 @@ export default class Authors extends Vue {
     } else {
       return this.visibleAuthors;
     }
+  }
+
+  public setTempAuthorFilter(event: { target: { value: string } }) {
+    this.tempAuthorFilter = event.target.value;
   }
 
   public async loadMore() {

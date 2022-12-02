@@ -15,40 +15,55 @@
 -->
 
 <template>
-  <div class="flex flex-col card card-clickable p-4">
-    <!-- Author photo and name -->
-    <div class="frc">
-      <CircleImage
-        v-if="authorImageLoaded"
-        :lazy="true"
-        size="card-avatar"
-        class="mr-2"
-        :src="`https://avatars.githubusercontent.com/${repo.metadata.owner}`"
-      />
-      <div v-else v-html="dynamicAuthorImage"></div>
-      <span class="font-display text-lg">{{ repo.metadata.owner }}</span>
-
-      <ProductLogo
-        v-if="showLogo"
-        size="xtiny"
-        :productKey="repo.product"
-        class="ml-auto"
-      />
-    </div>
-
+  <div class="flex flex-col card card-clickable p-4" :id="`${repo.id}-card`">
     <!-- Title -->
-    <router-link :to="link" class="mt-4 wrap-lines-3">
-      <h3>{{ repo.metadata.repo }}</h3>
+    <router-link :to="link" class="wrap-lines-3">
+      <h3>{{ repo.metadata.name }}</h3>
     </router-link>
 
     <!-- Tags -->
-    <div v-if="showTags" class="mt-4 frc flex-wrap gap-2">
+    <div v-if="showTags" class="card-tags mt-4 frc flex-wrap gap-2">
       <TagChip
         v-for="t in repo.metadata.tags"
         :key="t"
         :label="getTag(t).label"
         :textColor="getTag(t).textColor"
         :bgColor="getTag(t).bgColor"
+      />
+    </div>
+
+    <!-- Author photo and name -->
+    <div class="frc mt-6">
+      <!-- Link to author (if present) -->
+      <template v-if="authorId">
+        <router-link :to="`/authors/${authorId}`" class="frc">
+          <CircleImage
+            v-if="authorImageLoaded"
+            :lazy="true"
+            size="card-avatar"
+            class="mr-2"
+            :src="authorPhotoUrl"
+          />
+          <div v-else v-html="dynamicAuthorImage"></div>
+          <span class="font-display text-lg">{{ repo.metadata.owner }}</span>
+        </router-link>
+      </template>
+      <template v-else>
+        <CircleImage
+          v-if="authorImageLoaded"
+          :lazy="true"
+          size="card-avatar"
+          class="mr-2"
+          :src="authorPhotoUrl"
+        />
+        <div v-else v-html="dynamicAuthorImage"></div>
+        <span class="font-display text-lg">{{ repo.metadata.owner }}</span>
+      </template>
+      <ProductLogo
+        v-if="showLogo"
+        size="xtiny"
+        :productKey="repo.product"
+        class="product-logo ml-auto"
       />
     </div>
 
@@ -89,6 +104,7 @@ import MaterialButton from "@/components/MaterialButton.vue";
 import TagChip from "@/components/TagChip.vue";
 import ProductLogo from "@/components/ProductLogo.vue";
 import CircleImage from "@/components/CircleImage.vue";
+import { getApiHost } from "@/plugins/data";
 import { ColorJson } from "../assets/ts/profile-colors";
 
 import * as dates from "@/plugins/dates";
@@ -110,7 +126,22 @@ export default class LargeRepoCard extends Vue {
   public authorImageLoaded = false;
 
   async mounted() {
+    if (this.isStale(this.repo.stats.lastUpdated)) {
+      document.getElementById(`${this.repo.id}-card`)!.className +=
+        " stale-card";
+    }
     this.authorImageLoaded = await this.getImage();
+  }
+
+  public isStale(lastUpdated: number) {
+    const daysAgo = dates.renderDaysAgo(lastUpdated);
+    if (daysAgo.includes("months ago")) {
+      const monthsAgo = daysAgo.split(" months ago");
+      if (parseInt(monthsAgo[0]) > 18) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public renderDaysAgo(lastUpdated: number) {
@@ -121,11 +152,19 @@ export default class LargeRepoCard extends Vue {
     return product.getTag(this.repo.product, value);
   }
 
+  get authorPhotoUrl(): string {
+    if (this.authorId) {
+      return `${getApiHost()}/api/authorPhoto?id=${this.authorId}`;
+    } else if (this.repo.metadata.owner) {
+      return `https://avatars.githubusercontent.com/${this.repo.metadata.owner}`;
+    }
+
+    return '';
+  }
+
   public async getImage() {
-    if (this.repo.metadata.owner) {
-      const imageExists = await this.imageExists(
-        `https://avatars.githubusercontent.com/${this.repo.metadata.owner}`
-      );
+    if (this.authorPhotoUrl) {
+      const imageExists = await this.imageExists(this.authorPhotoUrl);
       if (!imageExists) {
         return false;
       } else {
@@ -160,6 +199,17 @@ export default class LargeRepoCard extends Vue {
       hash |= 0;
     }
     return Math.abs(hash);
+  }
+
+  get authorId() {
+    if (
+      this.repo.metadata.authorIds &&
+      this.repo.metadata.authorIds.length > 0
+    ) {
+      return this.repo.metadata.authorIds[0];
+    }
+
+    return undefined;
   }
 
   get link() {
