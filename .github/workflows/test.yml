@@ -46,7 +46,7 @@ jobs:
       - name: Validate Schemas
         run: (cd shared && npm run validate)
 
-      - name: Cypress Run
+      - name: Run e2e Tests
         uses: cypress-io/github-action@v4
         with:
-          run: (cd app && npm run serve)
+          start: (cd app && npm run serve)
